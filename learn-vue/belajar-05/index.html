@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Belajar Vuejs</title>
+</head>
+<body>
+
+    <div id="app">
+        <counter subject="Likes"></counter>
+        <counter subject="Dislikes"></counter>
+    </div>
+
+    <template id="counter-template">
+        <h1>{{ subject }}</h1>
+        <button @click.prevent="count += 1">Increment {{ count }}</button>
+    </template>
+
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/vue/1.0.16/vue.js"></script>
+    <script>
+    Vue.component('counter', {
+        template: '#counter-template',
+        props: {
+            subject: {
+                type: String,
+                required: true,
+                default: 'Hello World'
+            }
+        },
+        data: function () {
+            return {
+                count: 0
+            };
+        }
+    });
+    new Vue({
+        el: '#app',
+        data: {
+            count: 0
+        }
+    });
+    </script>
+</body>
+</html>

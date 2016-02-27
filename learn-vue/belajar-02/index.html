@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Belajar Vuejs</title>
+</head>
+<body>
+
+    <div id="app">
+        <form>
+            <span class="error" v-show="!message">
+                You must enter a message
+            </span>
+            <br/>
+
+            <textarea v-model="message"></textarea>
+            <br/>
+            <button type="submit">
+                Send message
+            </button>
+
+            <pre>
+                {{ $data | json }}
+            </pre>
+        </form>
+    </div>
+
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/vue/1.0.16/vue.min.js"></script>
+    <script>
+        new Vue({
+            el: '#app',
+            data: {
+                message: ''
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Belajar Vuejs</title>
+</head>
+<body>
+
+    <h1>{{ fullname }}</h1>
+    <input type="text" v-model="firstname" placeholder="First Name">
+    <input type="text" v-model="lastname" placeholder="Last Name">
+
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/vue/1.0.16/vue.js"></script>
+    <script>
+        new Vue({
+            el: 'body',
+            data: {
+                firstname: 'Wayan',
+                lastname: 'Jimmy'
+            },
+            computed: {
+                fullname: function() {
+                    return this.firstname + ' ' + this.lastname;
+                }
+            }
+        });
+    </script>
+</body>
+</html>
