@@ -1,0 +1,1 @@
+<html><head><title>relay.msg.yahoo.com Not Found</title></head><body>Not Found<!-- failure --><!-- relay.msg.yahoo.com --></body></html>
