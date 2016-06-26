@@ -2,7 +2,7 @@
 
 namespace App;
 
-class Collection implements \ArrayAccess
+class Collection implements \ArrayAccess, \Countable
 {
     protected $items;
 
@@ -53,5 +53,10 @@ class Collection implements \ArrayAccess
     public function offsetUnset($offset)
     {
     	unset($this->items[$offset]);
+    }
+
+    public function count()
+    {
+    	return count($this->items);
     }
 }
