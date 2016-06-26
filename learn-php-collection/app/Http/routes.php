@@ -11,15 +11,25 @@
 |
 */
 
-function getUserEmails($users) {
-	return App\Collection::make($users)->filter(function ($user) {
-		return $user['email'] !== null;
-	})->map(function ($user) {
-		return $user['email'];
-	})->toArray();
+function getUserEmails($users)
+{
+    return App\Collection::make($users)->filter(function ($user) {
+        return $user['email'] !== null;
+    })->map(function ($user) {
+        return $user['email'];
+    })->toArray();
 }
 
 Route::get('/', function () {
-	$users = App\User::all()->toArray();
-	dd(getUserEmails($users));
+    // $users = App\User::all()->toArray();
+    // dd(getUserEmails($users));
+    
+    $items = App\Collection::make([1, 2, 3]);
+    dump($items[2]);
+
+    $items[] = 4;
+
+    dump(isset($items[3]));
+
+    dump($items);
 });
