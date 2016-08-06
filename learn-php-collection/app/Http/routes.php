@@ -34,4 +34,8 @@ Route::get('/', function () {
     dump($items);
 
     dump(count($items));
+
+    foreach ($items as $item) {
+    	dump($item);
+    }
 });

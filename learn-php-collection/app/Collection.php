@@ -2,7 +2,7 @@
 
 namespace App;
 
-class Collection implements \ArrayAccess, \Countable
+class Collection implements \ArrayAccess, \Countable, \Iterator
 {
     protected $items;
 
@@ -58,5 +58,10 @@ class Collection implements \ArrayAccess, \Countable
     public function count()
     {
     	return count($this->items);
+    }
+
+    public function getIterator()
+    {
+    	return new \ArrayIterator($this->items);
     }
 }
