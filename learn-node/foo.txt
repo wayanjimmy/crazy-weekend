@@ -1,0 +1,6 @@
+Lets have a closer look at what's happening. First we create a font object with new canvas.Font() by passing the font name and path (to the regular font file) as parameters. Then additional font faces are added using font.addFace() by passing the font face path, weight and style as parameters. Finaly the font is ready to be added to the desired context using canvas.contextContainer.addFont() (when using createPNGStream or createJPEGStream) or canvas.contextTop.addFont() (when using toDataURL or toDataURLWithMultiplier).
+
+Now we can use our font by setting the fontFamily property of fabric.Text objects to the font name. In combination with the fontWeight and fontStyle properties we are able to apply the font faces we've added. See Part 2 (Text) for more info on these properties. 
+Note that the example shows how to use custom fonts when creating new text objects, but this also applies to text objects loaded via JSON.
+
+And so this brings us to the end of the 4-part series on Fabric. I hope you're now equiped with enough knowledge to create something interesting, cool, useful, funny, challenging, exciting!
