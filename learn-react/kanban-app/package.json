@@ -5,7 +5,7 @@
   "description": "Boilerplate for [SurviveJS - React](http://survivejs.com/react/introduction/)",
   "scripts": {
     "stats": "webpack --profile --json > stats.json",
-    "start": "webpack-dev-server",
+    "start": "webpack-dev-server --port 9090",
     "deploy": "gh-pages -d build",
     "build": "webpack",
     "test": "karma start",
