@@ -1,5 +1,7 @@
 <?php
 
+require __DIR__ . '/../vendor/autoload.php';
+
 use App\Team;
 
 class TeamTest extends PHPUnit_Framework_TestCase
