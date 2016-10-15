@@ -4,7 +4,20 @@
 // 2. copy of current state
 
 function posts(state = [], action) {
-  console.log(state, action);
+  switch(action.type) {
+    case 'INCREMENT_LIKES':
+      // return the updated state
+      return state.map(function (s, i) {
+        if (i == action.index) {
+          s.likes++;
+          return s;
+        }
+
+        return s;
+      });
+    default:
+      return state;
+  }
   return state;
 }
 
