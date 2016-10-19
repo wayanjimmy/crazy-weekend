@@ -23,23 +23,21 @@ class Canvas extends Component {
 		});
 		canvas.add(rect);
 
-		// create a rectangle object
-		let rect = new fabric.Rect({
-		  left: 100,
-		  top: 100,
-		  fill: 'red',
-		  width: 20,
-		  height: 20
-		});
-
-		canvas.add(rect);
-
 		this.setState({canvas});
 	}
 	render() {
+		let parentProps = Object.assign({}, this.props);
+		delete parentProps.children;
+		let childProps = Object.assign({}, {canvas: this.state.canvas, parent: parentProps});
+		let childrenWithProps = React.Children.map(this.props.children, (child, id) => {
+			let currentProps = Object.assign({}, childProps, {index: id});
+			return React.cloneElement(child, currentProps);
+		});
+
 		return (
 			<div>
-				<canvas id="canvas"></canvas>
+				<canvas id="canvas" width={this.props.width} height={this.props.height}></canvas>
+				{childrenWithProps}
 			</div>
 		);
 	}
@@ -51,11 +49,10 @@ Canvas.defaultProps = {
 	top: 0,
 	left: 0,
 	padding: 0,
-	title: 'Comic Title',
-	column: 1,
+	title: 'Canvas',
 	fill: 'white',
 	stroke: 'black',
-	strokeWidth: 1,
+	strokeWidth: 2,
 	fontFamily: 'Arial',
 	fontSize: 13,
 	upperCase: false
