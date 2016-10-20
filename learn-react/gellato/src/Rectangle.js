@@ -40,11 +40,11 @@ class Rectangle extends Component {
 			canvas.add(rectangle);
 		});
 	}
-	componentDidMount() {
-		this.createRectangle();
+	update() {
+		this.createRectangle()
 	}
-	componentWillReceiveProps() {
-		this.createRectangle();
+	componentDidMount() {
+		this.update();
 	}
 	render() {
 		return (

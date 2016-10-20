@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import Canvas from './Canvas';
 import Rectangle from './Rectangle';
+import Text from './Text';
 import './App.css';
 
 class App extends Component {
@@ -10,6 +11,7 @@ class App extends Component {
       	<Canvas fontSize="13" upperCase={true} padding={2}>
 					<Rectangle />
 					<Rectangle width={50} height={50} fill="blue" left={200} top={200} />
+					<Text value="Jimmy Ganteng" />
       	</Canvas>
       </div>
     );
