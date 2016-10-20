@@ -23,6 +23,17 @@ class Canvas extends Component {
 		});
 		canvas.add(rect);
 
+		canvas.on('object:selected', e => {
+			console.log(e);
+			if (e.target.get('type') === 'text') {
+				console.log('text is selected');
+			}
+		});
+
+		canvas.on('selection:cleared', e => {
+			console.log(e);
+		});
+
 		this.setState({canvas});
 	}
 	render() {

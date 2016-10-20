@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { Button } from 'react-foundation';
 import { fabric } from 'fabric-webpack';
 
 class Text extends Component {
@@ -38,7 +39,11 @@ class Text extends Component {
 	}
 	render() {
 		return (
-			<div />
+			<div>
+				<div className="text-editor">
+					<Button>B</Button>
+				</div>
+			</div>
 		);
 	}
 }
