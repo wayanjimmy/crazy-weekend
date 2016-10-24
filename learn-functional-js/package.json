@@ -1,0 +1,9 @@
+{
+  "name": "learn-functional-js",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {
+    "highland": "^2.10.0"
+  }
+}

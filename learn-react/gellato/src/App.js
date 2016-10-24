@@ -14,10 +14,10 @@ class App extends Component {
 						<Rectangle />
 						<Rectangle width={50} height={50} fill="blue" left={200} top={200} />
 						<Text value="Jimmy Ganteng" />
+						<Text left={100} top={100} />
 	      	</Canvas>
 				</Row>
       </div>
-
     );
   }
 }
