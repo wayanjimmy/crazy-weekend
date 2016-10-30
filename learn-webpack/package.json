@@ -1,0 +1,16 @@
+{
+  "name": "learn-webpack",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "webpack"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "html-webpack-plugin": "^2.24.0",
+    "webpack": "^1.13.3"
+  }
+}
