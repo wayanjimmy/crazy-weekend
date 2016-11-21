@@ -1,15 +1,17 @@
-package main
+psdadadasdasdadadackage main
 
 import (
 	"errors"
 	"fmt"
 	"math/rand"
+	"time"
 )
 
 var ErrTimeout = errors.New("The request timed out")
 var ErrRejected = errors.New("The request was rejected")
+var LimitExceed = errors.New("Limit exceed")
 
-var random = rand.New(rand.NewSource(34))
+var random = rand.New(rand.NewSource(time.Now().UnixNano()))
 
 func main() {
 	response, err := SendRequest("Hello")
@@ -26,7 +28,6 @@ func main() {
 
 // SendRequest is trying to send requesrequestt
 func SendRequest(req string) (string, error) {
-	fmt.Println(random.Int() % 3)
 	switch random.Int() % 3 {
 	case 0:
 		return "Success", nil
