@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"encoding/json"
 	"errors"
 	"fmt"
 
@@ -15,11 +16,35 @@ type Post struct {
 	Comments []Comment
 }
 
+func (o Post) MarshalJSON() ([]byte, error) {
+	json.Marshal(struct {
+		Id      int    `json:"id"`
+		Content string `json:"content"`
+		Author  string `json:"author"`
+	}{
+		Id:      o.Id,
+		Content: o.Content,
+		Author:  o.Author,
+	})
+}
+
 type Comment struct {
 	Id      int64
 	Content string
 	Author  string
 	Post    *Post
+}
+
+func (o Comment) MarshalJSON() ([]byte, error) {
+	return json.Marshal(struct {
+		Id      int    `json:"id"`
+		Content string `json:"content"`
+		Author  string `json:"author"`
+	}{
+		Id:      o.Id,
+		Content: o.Content,
+		Author:  o.Author,
+	})
 }
 
 var Db *sql.DB
