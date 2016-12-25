@@ -1,0 +1,18 @@
+{
+  "name": "promises",
+  "version": "1.0.0",
+  "description": "",
+  "main": "promise1.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "hget": "^3.0.1",
+    "marked": "^0.3.6",
+    "marked-terminal": "^2.0.0",
+    "request": "^2.79.0"
+  }
+}
