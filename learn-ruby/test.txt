@@ -1,0 +1,1 @@
+We mentioned before that it's very important to always close files. To help us with this, Ruby will automagically close the file if the open method is called with a block.
