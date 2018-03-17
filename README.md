@@ -1,1 +1,3 @@
-Thank's for looking, use it if it's useful :)
+# Crazy Weekend
+
+Weekend hemat ? koding aja 😂
