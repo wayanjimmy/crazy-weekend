@@ -1,0 +1,15 @@
+{
+  "name": "tinicompiler",
+  "version": "1.0.0",
+  "description": "",
+  "main": "tini-compiler.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "jest": "^22.4.3"
+  }
+}
