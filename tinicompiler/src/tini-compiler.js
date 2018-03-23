@@ -16,7 +16,7 @@ function tokenizer(input) {
       continue
     }
 
-    if (char === '(') {
+    if (char === ')') {
       tokens.push({
         type: 'paren',
         value: ')'
@@ -80,6 +80,8 @@ function tokenizer(input) {
       continue
     }
 
+    console.log(char)
+
     throw new TypeError('I dont know what this character is: ' + char)
   }
 
@@ -87,5 +89,5 @@ function tokenizer(input) {
 }
 
 module.exports = {
-  tokenizer,
+  tokenizer
 }
