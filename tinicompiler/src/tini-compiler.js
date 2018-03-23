@@ -80,8 +80,6 @@ function tokenizer(input) {
       continue
     }
 
-    console.log(char)
-
     throw new TypeError('I dont know what this character is: ' + char)
   }
 
@@ -153,5 +151,5 @@ function parser(tokens) {
 
 module.exports = {
   tokenizer,
-  parser,
+  parser
 }
