@@ -4,8 +4,10 @@
 
 // Depedencies
 const http = require('http')
+const https = require('https')
 const url = require('url')
 const {StringDecoder} = require('string_decoder')
+const fs = require('fs')
 const config = require('./config')
 
 // Define the handlers
@@ -23,8 +25,7 @@ const router = {
   sample: handlers.sample
 }
 
-// The server should respond to all requests with a string
-const server = http.createServer((req, res) => {
+const unifiedServer = (req, res) => {
   // Get the URL and parse it
   const parsedUrl = url.parse(req.url, true)
 
@@ -74,12 +75,33 @@ const server = http.createServer((req, res) => {
       res.end(payloadString)
     })
   })
-})
+}
+
+// The server should respond to all requests with a string
+const httpServer = http.createServer((req, res) => unifiedServer(req, res))
 
 // Start the server
-server.listen(config.port, () => {
+httpServer.listen(config.httpPort, () => {
   console.log(
-    `The server is listening on port ${config.port} now with environment ${
+    `The server is listening on port ${config.httpPort} now with environment ${
+      config.envName
+    }`
+  )
+})
+
+// The server should respond to all requests with a string
+const httpsServerOptions = {
+  key: fs.readFileSync('./https/key.pem'),
+  cert: fs.readFileSync('./https/cert.pem')
+}
+const httpsServer = https.createServer(httpsServerOptions, (req, res) =>
+  unifiedServer(req, res)
+)
+
+// Start the server
+httpsServer.listen(config.httpsPort, () => {
+  console.log(
+    `The server is listening on port ${config.httpsPort} now with environment ${
       config.envName
     }`
   )
