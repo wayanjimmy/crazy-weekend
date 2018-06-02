@@ -7,6 +7,21 @@ const http = require('http')
 const url = require('url')
 const {StringDecoder} = require('string_decoder')
 
+// Define the handlers
+const handlers = {}
+
+handlers.sample = (data, callback) => {
+  callback(406, {name: 'sample handler'})
+}
+handlers.notFound = (data, callback) => {
+  callback(404)
+}
+
+// Define a request router
+const router = {
+  sample: handlers.sample
+}
+
 // The server should respond to all requests with a string
 const server = http.createServer((req, res) => {
   // Get the URL and parse it
@@ -34,8 +49,27 @@ const server = http.createServer((req, res) => {
   req.on('end', () => {
     buffer += decoder.end()
 
-    res.end('Hello World\n')
-    console.log('Request received payload: ', buffer)
+    // Choose the handler this request should go to
+
+    const chosenHandler =
+      Object.keys(handlers).indexOf(trimmedPath) !== -1
+        ? handlers[trimmedPath]
+        : handlers.notFound
+
+    // Construct data to send to the handler
+    data = {
+      trimmedPath,
+      queryStringObject,
+      method,
+      headers,
+      payload: buffer
+    }
+
+    chosenHandler(data, (statusCode = 200, payload = {}) => {
+      const payloadString = JSON.stringify(payload)
+      res.writeHead(statusCode)
+      res.end(payloadString)
+    })
   })
 })
 
