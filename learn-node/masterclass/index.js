@@ -8,14 +8,16 @@ const https = require('https')
 const url = require('url')
 const {StringDecoder} = require('string_decoder')
 const fs = require('fs')
+
 const config = require('./config')
 
 // Define the handlers
 const handlers = {}
 
-handlers.sample = (data, callback) => {
-  callback(406, {name: 'sample handler'})
+handlers.ping = (data, callback) => {
+  callback(200)
 }
+
 handlers.notFound = (data, callback) => {
   callback(404)
 }
