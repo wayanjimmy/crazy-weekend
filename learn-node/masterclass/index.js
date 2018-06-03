@@ -10,21 +10,13 @@ const {StringDecoder} = require('string_decoder')
 const fs = require('fs')
 
 const config = require('./config')
-
-// Define the handlers
-const handlers = {}
-
-handlers.ping = (data, callback) => {
-  callback(200)
-}
-
-handlers.notFound = (data, callback) => {
-  callback(404)
-}
+const handlers = require('./lib/handlers')
+const helpers = require('./lib/helpers')
 
 // Define a request router
 const router = {
-  sample: handlers.sample
+  sample: handlers.sample,
+  users: handlers.users
 }
 
 const unifiedServer = (req, res) => {
@@ -66,7 +58,7 @@ const unifiedServer = (req, res) => {
       queryStringObject,
       method,
       headers,
-      payload: buffer
+      payload: helpers.parseJsonToObject(buffer)
     }
 
     chosenHandler(data, (statusCode = 200, payload = {}) => {
