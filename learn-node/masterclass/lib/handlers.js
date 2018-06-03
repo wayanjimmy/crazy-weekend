@@ -22,9 +22,30 @@ handlers.users = (data, callback) => {
 // Container for the users submethods
 handlers._users = {}
 
-// Get all users
+// TODO: only authenticated user access their object. If one not found use the not found handler.
 handlers._users.get = (data, callback) => {
-  callback(200, {})
+  // Check that phone number is valid
+  const phone =
+    typeof data.queryStringObject.phone === 'string' &&
+    data.queryStringObject.phone.trim().length === 10
+      ? data.queryStringObject.phone.trim()
+      : false
+
+  if (phone) {
+    // Lookup the user
+    dataStore.read('users', phone, (err, data) => {
+      console.log(err, data)
+      if (!err && data) {
+        // Remove hashedPassword before return response to the world
+        delete data.hashedPassword
+        callback(200, data)
+      } else {
+        callback(404, {errors: 'user not found'})
+      }
+    })
+  } else {
+    callback(400, {errors: 'missing required fields'})
+  }
 }
 
 // Create a new user
