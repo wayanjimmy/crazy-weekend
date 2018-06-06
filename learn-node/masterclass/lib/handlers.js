@@ -116,7 +116,10 @@ handlers._users.post = (data, callback) => {
 }
 
 // Edit an user
-handlers._users.put = (data, callback) => {}
+// TODO: only authenticated user access their object. If one not found use the not found handler.
+handlers._users.put = (data, callback) => {
+
+}
 
 // Delete an user
 handlers._users.delete = (data, callback) => {}

@@ -1,0 +1,20 @@
+{
+  "name": "pirplets",
+  "scripts": {
+    "lint": "tslint -p tsconfig.json -c tslint.json",
+    "fmt": "prettier --write *.ts* *.js *.json",
+    "build": "parcel build --out-dir=dist/ --log-level=1 --no-minify --target=node main.ts",
+    "start": "node ./dist/main.js"
+  },
+  "devDependencies": {
+    "@types/node": "^10.3.1",
+    "babel-polyfill": "^6.26.0",
+    "parcel-bundler": "^1.8.1",
+    "prettier": "^1.13.4",
+    "tslint": "^5.10.0",
+    "typescript": "^2.9.1"
+  },
+  "engines": {
+    "node": "8.9.4"
+  }
+}
