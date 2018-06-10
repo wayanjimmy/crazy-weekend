@@ -212,6 +212,69 @@ handlers._users.delete = (data, callback) => {
   }
 }
 
+handlers.tokens = (data, callback) => {
+  const acceptableMethods = ['get', 'post', 'put', 'delete']
+
+  if (acceptableMethods.indexOf(data.method) > -1) {
+    handlers._tokens[data.method](data, callback)
+  } else {
+    callback(405)
+  }
+}
+
+handlers._tokens = {}
+
+handlers._tokens.post = (data, callback) => {
+  // check for required fields
+  const phone =
+    typeof data.payload.phone === 'string' &&
+    data.payload.phone.trim().length === 10
+      ? data.payload.phone.trim()
+      : false
+
+  const password =
+    typeof data.payload.password === 'string' &&
+    data.payload.password.trim().length > 0
+      ? data.payload.password.trim()
+      : false
+
+  if (phone && password) {
+    dataStore.read('users', phone, (err, userData) => {
+      if (!err && userData) {
+        const hashedPassword = helpers.hash(password)
+        if (hashedPassword === userData.hashedPassword) {
+          const tokenId = helpers.createRandomString(20)
+          const expires = Date.now() + 1000 * 60 * 60
+          const tokenObject = {
+            phone,
+            id: tokenId,
+            expires
+          }
+
+          // Store the token
+          dataStore.create('tokens', tokenId, tokenObject, err => {
+            if (!err) {
+              callback(200, tokenObject)
+            } else {
+              console.log(err)
+              callback(500, {errors: 'Could not create the new token'})
+            }
+          })
+        } else {
+          callback(400, {errors: `Password did not match the specified user`})
+        }
+      } else {
+        callback(400, {errors: 'could not find the specified user'})
+      }
+    })
+  } else {
+    callback(400, {errors: 'Missing requried fields'})
+  }
+}
+handlers._tokens.get = (data, callback) => {}
+handlers._tokens.put = (data, callback) => {}
+handlers._tokens.delete = (data, callback) => {}
+
 handlers.notFound = (data, callback) => {
   callback(404)
 }

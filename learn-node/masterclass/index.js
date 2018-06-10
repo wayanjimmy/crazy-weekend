@@ -16,7 +16,8 @@ const helpers = require('./lib/helpers')
 // Define a request router
 const router = {
   sample: handlers.sample,
-  users: handlers.users
+  users: handlers.users,
+  tokens: handlers.tokens,
 }
 
 const unifiedServer = (req, res) => {

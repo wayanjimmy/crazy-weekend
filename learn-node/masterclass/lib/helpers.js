@@ -27,6 +27,20 @@ const helpers = {
     } catch (e) {
       return {}
     }
+  },
+
+  createRandomString(len) {
+    len = typeof len === 'number' && len > 0 ? len : false
+    if (len) {
+      const possibleChars = 'abcdefghijklmopqrstuvwxyz0123456789'
+      return Array(len)
+        .fill()
+        .map(() =>
+          possibleChars.charAt(Math.floor(Math.random() * possibleChars.length))
+        )
+        .join('')
+    }
+    return false
   }
 }
 
