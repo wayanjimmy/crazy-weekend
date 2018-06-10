@@ -22,32 +22,6 @@ handlers.users = (data, callback) => {
 // Container for the users submethods
 handlers._users = {}
 
-// TODO: only authenticated user access their object. If one not found use the not found handler.
-handlers._users.get = (data, callback) => {
-  // Check that phone number is valid
-  const phone =
-    typeof data.queryStringObject.phone === 'string' &&
-    data.queryStringObject.phone.trim().length === 10
-      ? data.queryStringObject.phone.trim()
-      : false
-
-  if (phone) {
-    // Lookup the user
-    dataStore.read('users', phone, (err, data) => {
-      console.log(err, data)
-      if (!err && data) {
-        // Remove hashedPassword before return response to the world
-        delete data.hashedPassword
-        callback(200, data)
-      } else {
-        callback(404, {errors: 'user not found'})
-      }
-    })
-  } else {
-    callback(400, {errors: 'missing required fields'})
-  }
-}
-
 // Create a new user
 handlers._users.post = (data, callback) => {
   const firstName =
@@ -115,14 +89,128 @@ handlers._users.post = (data, callback) => {
   }
 }
 
+// TODO: only authenticated user access their object. If one not found use the not found handler.
+handlers._users.get = (data, callback) => {
+  // Check that phone number is valid
+  const phone =
+    typeof data.queryStringObject.phone === 'string' &&
+    data.queryStringObject.phone.trim().length === 10
+      ? data.queryStringObject.phone.trim()
+      : false
+
+  if (phone) {
+    // Lookup the user
+    dataStore.read('users', phone, (err, data) => {
+      console.log(err, data)
+      if (!err && data) {
+        // Remove hashedPassword before return response to the world
+        delete data.hashedPassword
+        callback(200, data)
+      } else {
+        callback(404, {errors: 'user not found'})
+      }
+    })
+  } else {
+    callback(400, {errors: 'missing required fields'})
+  }
+}
+
 // Edit an user
 // TODO: only authenticated user access their object. If one not found use the not found handler.
 handlers._users.put = (data, callback) => {
+  // check for required fields
+  const phone =
+    typeof data.payload.phone === 'string' &&
+    data.payload.phone.trim().length === 10
+      ? data.payload.phone.trim()
+      : false
 
+  // check for optional fields
+  const firstname =
+    typeof data.payload.firstName === 'string' &&
+    data.payload.firstName.trim().length > 0
+      ? data.payload.firstName.trim()
+      : false
+
+  const lastname =
+    typeof data.payload.lastName === 'string' &&
+    data.payload.lastName.trim().length > 0
+      ? data.payload.lastName.trim()
+      : false
+
+  const password =
+    typeof data.payload.password === 'string' &&
+    data.payload.password.trim().length > 0
+      ? data.payload.password.trim()
+      : false
+
+  // Error if phone is invalid
+  if (phone) {
+    if (firstName || lastName || password) {
+      // Lookup the user
+      dataStore.read('users', phone, (err, userData) => {
+        if (!err && userData) {
+          if (firstname) {
+            userData.firstName = firstName
+          }
+
+          if (lastname) {
+            userData.lastName = lastName
+          }
+
+          if (password) {
+            userData.password = helpers.hash(password)
+          }
+
+          dataStore.update('users', phone, userData, err => {
+            if (!err) {
+              callback(200)
+            } else {
+              console.log(err)
+              callback(500, {errors: 'could not update the user'})
+            }
+          })
+        } else {
+          callback(400, {errors: 'The specified user does not exist'})
+        }
+      })
+    } else {
+      callback(400, {errors: 'Missing fields to update'})
+    }
+  } else {
+    callback(400, {errors: 'Missing required fields'})
+  }
 }
 
 // Delete an user
-handlers._users.delete = (data, callback) => {}
+handlers._users.delete = (data, callback) => {
+  // Check that phone number is valid
+  const phone =
+    typeof data.queryStringObject.phone === 'string' &&
+    data.queryStringObject.phone.trim().length === 10
+      ? data.queryStringObject.phone.trim()
+      : false
+
+  if (phone) {
+    // Lookup the user
+    dataStore.read('users', phone, (err, data) => {
+      console.log(err, data)
+      if (!err && data) {
+        dataStore.delete('users', phone, err => {
+          if (!err) {
+            callback(200)
+          } else {
+            callback(500, {errors: 'could not delete user'})
+          }
+        })
+      } else {
+        callback(404, {errors: 'user not found'})
+      }
+    })
+  } else {
+    callback(400, {errors: 'missing required fields'})
+  }
+}
 
 handlers.notFound = (data, callback) => {
   callback(404)
