@@ -271,8 +271,63 @@ handlers._tokens.post = (data, callback) => {
     callback(400, {errors: 'Missing requried fields'})
   }
 }
-handlers._tokens.get = (data, callback) => {}
-handlers._tokens.put = (data, callback) => {}
+
+handlers._tokens.get = (data, callback) => {
+  const id =
+    typeof data.queryStringObject.id === 'string' &&
+    data.queryStringObject.id.trim().length === 20
+      ? data.queryStringObject.id.trim()
+      : false
+
+  if (id) {
+    // Lookup the user
+    dataStore.read('tokens', id, (err, tokenData) => {
+      if (!err && tokenData) {
+        callback(200, tokenData)
+      } else {
+        callback(404, {errors: 'token not found'})
+      }
+    })
+  } else {
+    callback(400, {errors: 'missing required fields'})
+  }
+}
+
+handlers._tokens.put = (data, callback) => {
+  const id =
+    typeof data.payload.id === 'string' && data.payload.id.trim().length === 20
+      ? data.payload.id.trim()
+      : false
+
+  const extend = typeof data.payload.extend === 'string' && data.payload.extend
+
+  if (id && extend) {
+    dataStore.read('tokens', id, (err, tokenData) => {
+      if (!err && tokenData) {
+        if (tokenData.expires > Date.now()) {
+          tokenData.expires = Date.now() + 1000 * 60 * 60
+
+          dataStore.update('tokens', id, tokenData, err => {
+            if (!err) {
+            callback(200, tokenData)
+            } else {
+              callback(500, {errors: 'could not update the token expiration'})
+            }
+          })
+        } else {
+          callback(400, {
+            errors: 'token has already expired and cannot be extended'
+          })
+        }
+      } else {
+        callback(404, {errors: 'token not found'})
+      }
+    })
+  } else {
+    callback(400, {errors: 'missing required fields'})
+  }
+}
+
 handlers._tokens.delete = (data, callback) => {}
 
 handlers.notFound = (data, callback) => {
