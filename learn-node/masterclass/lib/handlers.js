@@ -328,7 +328,33 @@ handlers._tokens.put = (data, callback) => {
   }
 }
 
-handlers._tokens.delete = (data, callback) => {}
+handlers._tokens.delete = (data, callback) => {
+  const id =
+    typeof data.queryStringObject.id === 'string' &&
+    data.queryStringObject.id.trim().length === 20
+      ? data.queryStringObject.id.trim()
+      : false
+
+  if (id) {
+    // Lookup the user
+    dataStore.read('tokens', id, (err, data) => {
+      console.log(err, data)
+      if (!err && data) {
+        dataStore.delete('tokens', id, err => {
+          if (!err) {
+            callback(200)
+          } else {
+            callback(500, {errors: 'could not delete token'})
+          }
+        })
+      } else {
+        callback(404, {errors: 'token not found'})
+      }
+    })
+  } else {
+    callback(400, {errors: 'missing required fields'})
+  }
+}
 
 handlers.notFound = (data, callback) => {
   callback(404)
