@@ -2,6 +2,7 @@
 
 const dataStore = require('./data')
 const helpers = require('./helpers')
+const config = require('../config')
 
 const handlers = {}
 
@@ -99,15 +100,32 @@ handlers._users.get = (data, callback) => {
       : false
 
   if (phone) {
-    // Lookup the user
-    dataStore.read('users', phone, (err, data) => {
-      console.log(err, data)
-      if (!err && data) {
-        // Remove hashedPassword before return response to the world
-        delete data.hashedPassword
-        callback(200, data)
+    // Get the token from headers
+    const token =
+      typeof data.headers.token === 'string' ? data.headers.token : false
+    handlers._tokens.verifyToken(token, phone, tokenIsValid => {
+      if (tokenIsValid) {
+        dataStore.read('users', phone, (err, data) => {
+          if (!err && data) {
+            // Lookup the user
+            dataStore.read('users', phone, (err, data) => {
+              console.log(err, data)
+              if (!err && data) {
+                // Remove hashedPassword before return response to the world
+                delete data.hashedPassword
+                callback(200, data)
+              } else {
+                callback(404, {errors: 'user not found'})
+              }
+            })
+          } else {
+            callback(404)
+          }
+        })
       } else {
-        callback(404, {errors: 'user not found'})
+        callback(403, {
+          errors: 'missing required token in header or token is invalid'
+        })
       }
     })
   } else {
@@ -116,7 +134,6 @@ handlers._users.get = (data, callback) => {
 }
 
 // Edit an user
-// TODO: only authenticated user access their object. If one not found use the not found handler.
 handlers._users.put = (data, callback) => {
   // check for required fields
   const phone =
@@ -147,31 +164,42 @@ handlers._users.put = (data, callback) => {
   // Error if phone is invalid
   if (phone) {
     if (firstName || lastName || password) {
-      // Lookup the user
-      dataStore.read('users', phone, (err, userData) => {
-        if (!err && userData) {
-          if (firstname) {
-            userData.firstName = firstName
-          }
+      const token =
+        typeof data.headers.token === 'string' ? data.headers.token : false
 
-          if (lastname) {
-            userData.lastName = lastName
-          }
+      handlers._tokens.verifyToken(token, phone, tokenIsValid => {
+        if (tokenIsValid) {
+          // Lookup the user
+          dataStore.read('users', phone, (err, userData) => {
+            if (!err && userData) {
+              if (firstname) {
+                userData.firstName = firstName
+              }
 
-          if (password) {
-            userData.password = helpers.hash(password)
-          }
+              if (lastname) {
+                userData.lastName = lastName
+              }
 
-          dataStore.update('users', phone, userData, err => {
-            if (!err) {
-              callback(200)
+              if (password) {
+                userData.password = helpers.hash(password)
+              }
+
+              dataStore.update('users', phone, userData, err => {
+                if (!err) {
+                  callback(200)
+                } else {
+                  console.log(err)
+                  callback(500, {errors: 'could not update the user'})
+                }
+              })
             } else {
-              console.log(err)
-              callback(500, {errors: 'could not update the user'})
+              callback(400, {errors: 'The specified user does not exist'})
             }
           })
         } else {
-          callback(400, {errors: 'The specified user does not exist'})
+          callback(403, {
+            errors: 'missing required token in header or token is invalid'
+          })
         }
       })
     } else {
@@ -192,19 +220,29 @@ handlers._users.delete = (data, callback) => {
       : false
 
   if (phone) {
-    // Lookup the user
-    dataStore.read('users', phone, (err, data) => {
-      console.log(err, data)
-      if (!err && data) {
-        dataStore.delete('users', phone, err => {
-          if (!err) {
-            callback(200)
+    const token =
+      typeof data.headers.token === 'string' ? data.headers.token : false
+
+    handlers._tokens.verifyToken(token, phone, tokenIsValid => {
+      if (tokenIsValid) {
+        // Lookup the user
+        dataStore.read('users', phone, (err, data) => {
+          if (!err && data) {
+            dataStore.delete('users', phone, err => {
+              if (!err) {
+                callback(200)
+              } else {
+                callback(500, {errors: 'could not delete user'})
+              }
+            })
           } else {
-            callback(500, {errors: 'could not delete user'})
+            callback(404, {errors: 'user not found'})
           }
         })
       } else {
-        callback(404, {errors: 'user not found'})
+        callback(403, {
+          errors: 'missing required token in header or token is invalid'
+        })
       }
     })
   } else {
@@ -309,7 +347,7 @@ handlers._tokens.put = (data, callback) => {
 
           dataStore.update('tokens', id, tokenData, err => {
             if (!err) {
-            callback(200, tokenData)
+              callback(200, tokenData)
             } else {
               callback(500, {errors: 'could not update the token expiration'})
             }
@@ -338,7 +376,6 @@ handlers._tokens.delete = (data, callback) => {
   if (id) {
     // Lookup the user
     dataStore.read('tokens', id, (err, data) => {
-      console.log(err, data)
       if (!err && data) {
         dataStore.delete('tokens', id, err => {
           if (!err) {
@@ -353,6 +390,142 @@ handlers._tokens.delete = (data, callback) => {
     })
   } else {
     callback(400, {errors: 'missing required fields'})
+  }
+}
+
+handlers._tokens.verifyToken = (id, phone, callback) => {
+  dataStore.read('tokens', id, (err, tokenData) => {
+    if (!err && tokenData) {
+      if (tokenData.phone === phone && tokenData.expires > Date.now()) {
+        callback(true)
+      } else {
+        callback(false)
+      }
+    } else {
+      callback(false)
+    }
+  })
+}
+
+handlers.checks = (data, callback) => {
+  const acceptableMethods = ['post']
+
+  if (acceptableMethods.indexOf(data.method) > -1) {
+    handlers._checks[data.method](data, callback)
+  } else {
+    callback(405)
+  }
+}
+
+// Container for all checks method
+handlers._checks = {}
+
+// Checks - post
+// Required data: protocol, url, method, successCodes, timeoutSeconds
+// Optional data: none
+
+handlers._checks.post = (data, callback) => {
+  const protocol =
+    typeof data.payload.protocol === 'string' &&
+    ['https', 'http'].indexOf(data.payload.protocol) > -1
+      ? data.payload.protocol
+      : false
+
+  const url =
+    typeof data.payload.url === 'string' && data.payload.url.length > 0
+      ? data.payload.url
+      : false
+
+  const method =
+    typeof data.payload.method === 'string' &&
+    ['post', 'get', 'put', 'delete'].indexOf(data.payload.method) > -1
+      ? data.payload.method
+      : false
+
+  const successCodes =
+    typeof data.payload.successCodes === 'object' &&
+    data.payload.successCodes instanceof Array &&
+    data.payload.successCodes.length > 0
+      ? data.payload.successCodes
+      : false
+
+  const timeoutSeconds =
+    typeof data.payload.timeoutSeconds === 'number' &&
+    data.payload.timeoutSeconds % 1 === 0 &&
+    data.payload.timeoutSeconds >= 1 &&
+    data.payload.timeoutSeconds <= 5
+      ? data.payload.timeoutSeconds
+      : false
+
+  if (protocol && url && method && successCodes && timeoutSeconds) {
+    const token =
+      typeof data.headers.token === 'string' ? data.headers.token : false
+
+    // Lookup the user by reading the token
+    dataStore.read('tokens', token, (err, tokenData) => {
+      if (!err && tokenData) {
+        const userPhone = tokenData.phone
+
+        dataStore.read('users', userPhone, (err, userData) => {
+          if (!err && userData) {
+            const userChecks =
+              typeof userData.checks === 'object' &&
+              userData.checks instanceof Array
+                ? userData.checks
+                : []
+
+            // Verify that the user has less then the number of max-checks-per-user
+            if (userChecks.length < config.maxChecks) {
+              // Create a random id for the check
+              const checkId = helpers.createRandomString(20)
+
+              // Create the check object and include the user's phone
+              const checkObject = {
+                id: checkId,
+                userPhone,
+                protocol,
+                url,
+                method,
+                successCodes,
+                timeoutSeconds
+              }
+
+              dataStore.create('checks', checkId, checkObject, err => {
+                if (!err) {
+                  userData.checks = userChecks
+                  userData.checks.push(checkId)
+
+                  // Save the new user data
+                  dataStore.update('users', userPhone, userData, err => {
+                    if (!err) {
+                      callback(200, checkObject)
+                    } else {
+                      callback(500, {
+                        error: 'could not update the user with the new check'
+                      })
+                    }
+                  })
+                } else {
+                  callback(500, {error: 'could not create the new check'})
+                }
+              })
+            } else {
+              callback(400, {
+                error: `the user already has the maximum number of checks (${
+                  config.maxChecks
+                })`
+              })
+            }
+          } else {
+            callback(403)
+          }
+        })
+      } else {
+        callback(403)
+      }
+    })
+  } else {
+    callback(400, {error: 'missing required fields'})
   }
 }
 

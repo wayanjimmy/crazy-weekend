@@ -13,13 +13,6 @@ const config = require('./config')
 const handlers = require('./lib/handlers')
 const helpers = require('./lib/helpers')
 
-// Define a request router
-const router = {
-  sample: handlers.sample,
-  users: handlers.users,
-  tokens: handlers.tokens,
-}
-
 const unifiedServer = (req, res) => {
   // Get the URL and parse it
   const parsedUrl = url.parse(req.url, true)
