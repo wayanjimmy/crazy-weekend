@@ -12,7 +12,7 @@ environments.development = {
   httpsPort: 3001,
   envName: 'development',
   hashingSecret: 'somethingSecret',
-  maxChecks: 5,
+  maxChecks: 5
 }
 
 // Production environment
@@ -21,7 +21,7 @@ environments.production = {
   httpsPort: 5001,
   envName: 'production',
   hashingSecret: 'somethingSecret',
-  maxChecks: 5,
+  maxChecks: 5
 }
 
 const currentEnvironment =

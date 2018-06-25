@@ -72,6 +72,7 @@ handlers._users.post = (data, callback) => {
           }
 
           dataStore.create('users', phone, user, err => {
+            // console.log(err)
             if (!err) {
               callback(200, user)
             } else {

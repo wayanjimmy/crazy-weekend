@@ -1,5 +1,10 @@
 const fs = require('fs')
 const path = require('path')
+const {promisify} = require('util')
+
+const openFileAsync = promisify(fs.open)
+const writeFileAsync = promisify(fs.writeFile)
+const closeFileAsync = promisify(fs.close)
 
 const helpers = require('./helpers')
 
@@ -7,32 +12,17 @@ const lib = {}
 
 lib.baseDir = path.join(__dirname, '/../.data/')
 
-lib.create = (dir, filename, data, callback) => {
-  fs.open(
-    `${lib.baseDir + dir}/${filename}.json`,
-    'wx',
-    (err, fileDescriptor) => {
-      if (!err && fileDescriptor) {
-        const stringData = JSON.stringify(data)
-
-        fs.writeFile(fileDescriptor, stringData, err => {
-          if (!err) {
-            fs.close(fileDescriptor, err => {
-              if (!err) {
-                callback(false)
-              } else {
-                callback('Error closing new file')
-              }
-            })
-          } else {
-            callback('Error writing to a new file')
-          }
-        })
-      } else {
-        callback('Could not create a new file, it may already exists')
-      }
-    }
-  )
+lib.create = async (dir, filename, data, callback) => {
+  try {
+    const fileDescriptor = await openFileAsync(`${lib.baseDir + dir}/${filename}.json`, 'wx')
+   const stringData = JSON.stringify(data)
+  await writeFileAsync(fileDescriptor, stringData)
+  await closeFileAsync(fileDescriptor)
+  callback(false)
+  } catch (error) {
+    console.log(error)
+    callback('Something wrong')
+  }
 }
 
 lib.read = (dir, filename, callback) => {
