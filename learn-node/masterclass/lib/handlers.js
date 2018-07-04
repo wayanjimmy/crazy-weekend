@@ -57,7 +57,7 @@ handlers._users.post = (data, callback) => {
 
   if (firstName && lastName && phone && password && tosAgreement) {
     // Make sure that the user doesn't exist
-    dataStore.read('users', phone, (err, data) => {
+    dataStore.read('users', phone, async err => {
       if (err) {
         const hashedPassword = helpers.hash(password)
 
@@ -71,14 +71,12 @@ handlers._users.post = (data, callback) => {
             tosAgreement
           }
 
-          dataStore.create('users', phone, user, err => {
-            // console.log(err)
-            if (!err) {
-              callback(200, user)
-            } else {
-              callback(500, {errors: 'Error saving to data store'})
-            }
-          })
+          err = await dataStore.create('users', phone, user)
+          if (!err) {
+            callback(200, user)
+          } else {
+            callback(500, {errors: 'Error saving to data store'})
+          }
         } else {
           callback(500, {errors: 'Error hashing password'})
         }
@@ -278,7 +276,7 @@ handlers._tokens.post = (data, callback) => {
       : false
 
   if (phone && password) {
-    dataStore.read('users', phone, (err, userData) => {
+    dataStore.read('users', phone, async (err, userData) => {
       if (!err && userData) {
         const hashedPassword = helpers.hash(password)
         if (hashedPassword === userData.hashedPassword) {
@@ -291,14 +289,12 @@ handlers._tokens.post = (data, callback) => {
           }
 
           // Store the token
-          dataStore.create('tokens', tokenId, tokenObject, err => {
-            if (!err) {
-              callback(200, tokenObject)
-            } else {
-              console.log(err)
-              callback(500, {errors: 'Could not create the new token'})
-            }
-          })
+          err = await dataStore.create('tokens', tokenId, tokenObject)
+          if (!err) {
+            callback(200, tokenObject)
+          } else {
+            callback(500, {errors: 'Could not create the new token'})
+          }
         } else {
           callback(400, {errors: `Password did not match the specified user`})
         }

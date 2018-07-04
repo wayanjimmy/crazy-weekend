@@ -12,16 +12,26 @@ const lib = {}
 
 lib.baseDir = path.join(__dirname, '/../.data/')
 
-lib.create = async (dir, filename, data, callback) => {
+lib.create = async (dir, filename, data) => {
   try {
-    const fileDescriptor = await openFileAsync(`${lib.baseDir + dir}/${filename}.json`, 'wx')
-   const stringData = JSON.stringify(data)
-  await writeFileAsync(fileDescriptor, stringData)
-  await closeFileAsync(fileDescriptor)
-  callback(false)
-  } catch (error) {
-    console.log(error)
-    callback('Something wrong')
+    const fileDescriptor = await openFileAsync(
+      `${lib.baseDir + dir}/${filename}.json`,
+      'wx'
+    )
+    const stringData = JSON.stringify(data)
+    await writeFileAsync(fileDescriptor, stringData)
+    await closeFileAsync(fileDescriptor)
+  } catch (e) {
+    console.log(e)
+    return e.message
+  }
+
+  return false
+}
+
+lib.read = async (dir, filename) => {
+  try {
+  } catch (e) {
   }
 }
 
