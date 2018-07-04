@@ -2,6 +2,7 @@ import "reflect-metadata";
 import { createConnection } from "typeorm";
 import { User } from "./entity/User";
 import { Photo } from "./entity/Photo";
+import { PhotoMetadata } from "./entity/PhotoMetadata";
 
 createConnection()
   .then(async connection => {
@@ -29,6 +30,30 @@ createConnection()
     console.log("Loading photos from the database...");
     const photos = await connection.manager.find(Photo);
     console.log("Loaded photos: ", photos);
+
+    const photoRepo = connection.getRepository(Photo);
+
+    const photoToUpdate = await photoRepo.findOne();
+    if (photoToUpdate) {
+      photoToUpdate.name = "Me, my friends and pinguins";
+      await photoRepo.save(photoToUpdate);
+    }
+
+    const photoToRemove = await photoRepo.findOne();
+    if (photoToRemove) {
+      await photoRepo.remove(photoToRemove);
+    }
+
+    const metadata = new PhotoMetadata();
+    metadata.height = 640;
+    metadata.width = 480;
+    metadata.compressed = true;
+    metadata.comment = "cybershot";
+    metadata.orientation = "portrait";
+    metadata.photo = photo;
+
+    const metaRepo = connection.getRepository(PhotoMetadata);
+    await metaRepo.save(metadata);
 
     console.log("Here you can setup and run express/koa/any other framework.");
   })
