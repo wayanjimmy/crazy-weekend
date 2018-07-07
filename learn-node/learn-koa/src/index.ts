@@ -55,6 +55,12 @@ createConnection()
     const metaRepo = connection.getRepository(PhotoMetadata);
     await metaRepo.save(metadata);
 
+    const photosWithMetadata = await photoRepo.find({
+      relations: ["metadata"]
+    });
+
+    console.log("Loaded photos with meta: ", photosWithMetadata);
+
     console.log("Here you can setup and run express/koa/any other framework.");
   })
   .catch(error => console.log(error));
