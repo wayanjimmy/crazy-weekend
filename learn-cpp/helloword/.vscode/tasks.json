@@ -1,0 +1,15 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "build hello world",
+      "type": "shell",
+      "command": "clang++",
+      "args": ["-g", "helloworld.cpp"],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    }
+  ]
+}
