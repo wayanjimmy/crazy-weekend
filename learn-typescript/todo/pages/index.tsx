@@ -8,7 +8,7 @@ const originTodos: Todo[] = [
 	{ id: 1, text: "Buy egg", done: false, place: "work" },
 	{ id: 2, text: "Buy milk", done: false, place: "home" },
 	{
-		id: 2,
+		id: 3,
 		text: "Learn typescript",
 		done: false,
 		place: { custom: "learn" },
@@ -23,6 +23,7 @@ const IndexPage: React.SFC = () => {
 			id: todo.id,
 			text: todo.text,
 			done: !todo.done,
+			place: todo.place,
 		};
 	}
 
@@ -54,7 +55,7 @@ const IndexPage: React.SFC = () => {
 								<input
 									type="checkbox"
 									checked={todo.done}
-									onClick={() => {
+									onChange={() => {
 										const toggledTodos = todos.map((t) => {
 											if (t.id == todo.id) {
 												return toggleTodo(t);
@@ -66,7 +67,7 @@ const IndexPage: React.SFC = () => {
 									}}
 								/>
 								<span css={[tw`ml-2`]}>{todo.text}</span>
-								{' -- '}
+								{" -- "}
 								<span>
 									{todo.place
 										? placeToString(todo.place)
