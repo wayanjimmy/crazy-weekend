@@ -32,7 +32,7 @@ type loginRequest struct {
 
 func loginHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
-		fmt.Fprint(w, "Method not allowed", http.StatusMethodNotAllowed)
+		fmt.Fprintf(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 
 	}
@@ -54,10 +54,12 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 	if password, ok := users[credentials.Username]; ok {
 		username := credentials.Username
 		if password == credentials.Password {
-			if balance, ok := balances[username]; ok {
-				fmt.Fprintf(w, "Hi %s, your balance = %d", username, balance)
-				return
-			}
+			session, _ := store.Get(r, "auth")
+
+			session.Values["username"] = username
+			session.Save(r, w)
+
+			fmt.Fprint(w, "login succeed")
 		}
 	}
 
@@ -66,9 +68,23 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 
+func logoutHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		fmt.Fprintf(w, "method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	session, _ := store.Get(r, "auth")
+
+	session.Values["username"] = nil
+	session.Save(r, w)
+
+	fmt.Fprint(w, "logout succeed")
+}
+
 func handler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
-		fmt.Fprint(w, "method not allowed", http.StatusMethodNotAllowed)
+		fmt.Fprintf(w, "method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
 
@@ -84,8 +100,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if v, ok := balances[username]; ok {
-		balance = v
+	if balance, ok := balances[username]; ok {
 		http.Error(w, "something went wrong", http.StatusInternalServerError)
 	}
 
