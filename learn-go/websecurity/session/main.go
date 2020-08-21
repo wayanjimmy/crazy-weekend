@@ -60,6 +60,7 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 			session.Save(r, w)
 
 			fmt.Fprint(w, "login succeed")
+			return
 		}
 	}
 
@@ -70,7 +71,7 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 
 func logoutHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
-		fmt.Fprintf(w, "method not allowed", http.StatusMethodNotAllowed)
+		fmt.Fprint(w, "method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
 
@@ -84,7 +85,7 @@ func logoutHandler(w http.ResponseWriter, r *http.Request) {
 
 func handler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
-		fmt.Fprintf(w, "method not allowed", http.StatusMethodNotAllowed)
+		fmt.Fprint(w, "method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
 
@@ -100,7 +101,8 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if balance, ok := balances[username]; ok {
+	if v, ok := balances[username]; ok {
+		balance = v
 		http.Error(w, "something went wrong", http.StatusInternalServerError)
 	}
 
