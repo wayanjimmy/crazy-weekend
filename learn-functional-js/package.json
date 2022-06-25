@@ -6,6 +6,6 @@
   "dependencies": {
     "baconjs": "^0.7.88",
     "highland": "^2.10.0",
-    "node-fetch": "^1.6.3"
+    "node-fetch": "^2.6.7"
   }
 }
